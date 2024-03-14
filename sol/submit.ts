@@ -8,12 +8,16 @@ import { inspect } from "util";
 
 // Example usage
 const input = `
-6.7.4.
-......
-5.3...
-....3.
-4.4...
-.2..4.
+1...2..2.3
+..2...4.1.
+.......1.5
+..........
+6.6.7.9..4
+........3.
+.5..7....1
+......6.6.
+3.........
+.3..6.7.4.
 `;
 
 const gameBoard = new GameBoardImpl(input);
@@ -44,7 +48,7 @@ async function GameStart() {
     }
 
     gameBoard.printBoard();
-    await sleep(100);
+    //await sleep(10);
   }
   console.log("Game complete!");
   generateGameCompleteFile();

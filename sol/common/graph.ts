@@ -38,6 +38,10 @@ export class Graph {
     }
     this.adjacencyList.get(edge.start).push(edge);
   }
+
+  getNode(nodeId: NodeId): Node | undefined {
+    return this.nodes.get(nodeId);
+  }
 }
 
 export function parseGameStateToGraph(gameState: GameState): Graph {
