@@ -3,15 +3,10 @@ import {
   GameState,
   Cell,
   Coord,
-  Bridge,
   IslandCell,
+  Operation,
 } from "./gameModel";
-
-export function DeepCopyState(state: GameState): GameState {
-  return {
-    grid: state.grid.map((row) => row.map((cell) => ({ ...cell }))),
-  };
-}
+import { DeepCopyState, VerifyOperation, isValidCoord } from "./gameUtil";
 
 export class GameBoardImpl implements GameBoard {
   currentState: GameState;
@@ -57,8 +52,57 @@ export class GameBoardImpl implements GameBoard {
     return grid;
   }
 
-  addBridge(start: Coord, end: Coord, bridgeType: Bridge): void {
-    console.log(`Added ${bridgeType} bridge from ${start} to ${end}`);
+  addBridges(operations: Operation[]): boolean {
+    this.saveState();
+    for (let operation of operations) {
+      if (!VerifyOperation(operation, this.currentState)) {
+        // Always fall back to the last state
+        this.revertLastChange();
+        return false;
+      }
+      this.applyOperation(operation);
+    }
+
+    return true;
+  }
+
+  private applyOperation(operation: Operation): void {
+    const { start, end, bridge } = operation;
+    const isHorizontal = start[1] === end[1];
+    const direction = isHorizontal ? "horizontal" : "vertical";
+
+    // Define increments for iteration based on the direction of the bridge
+    const [startX, startY] = start;
+    const [endX, endY] = end;
+    const incrementX = isHorizontal ? 0 : (startX < endX ? 1 : -1);
+    const incrementY = isHorizontal ? (startY < endY ? 1 : -1) : 0;
+
+    // Iterate over the path and update/create bridge cells
+    for (let x = startX, y = startY; x !== endX || y !== endY; x += incrementX, y += incrementY) {
+      let cell = this.currentState.grid[x][y];
+
+      if (cell.cellType === "Water") {
+        // Create a new bridge cell
+        this.currentState.grid[x][y] = {
+          coord: [x, y],
+          cellType: "Bridge",
+          bridgeCount: bridge,
+          direction: direction
+        };
+      } else if (cell.cellType === "Bridge" && cell.direction === direction) {
+        // Increment the bridge count of an existing bridge cell
+        cell.bridgeCount += bridge;
+      }
+    }
+  }
+
+  revertLastChange(): void {
+    if (this.history.length > 1) {
+      this.history.pop();
+      this.currentState = this.history[this.history.length - 1];
+    } else {
+      console.log("No more states to revert to");
+    }
   }
 
   /**
@@ -78,15 +122,6 @@ export class GameBoardImpl implements GameBoard {
     return true;
   }
 
-  isValidCoord(coord: Coord): boolean {
-    return (
-      coord[0] >= 0 &&
-      coord[0] < this.currentState.grid.length &&
-      coord[1] >= 0 &&
-      coord[1] < this.currentState.grid[0].length
-    );
-  }
-
   verifyIsland(cell: IslandCell): boolean {
     let coord = cell.coord;
 
@@ -102,7 +137,7 @@ export class GameBoardImpl implements GameBoard {
       const [dx, dy] = directions[direction];
       let [x, y] = [coord[0] + dx, coord[1] + dy];
 
-      if (!this.isValidCoord([x, y])) {
+      if (!isValidCoord([x, y], this.currentState)) {
         continue;
       }
 
