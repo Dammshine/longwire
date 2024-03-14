@@ -1,3 +1,4 @@
+import { parseGameStateToGraph } from "./common/graph";
 import { GameBoardImpl } from "./game/game";
 
 // Example usage
@@ -16,3 +17,7 @@ const input = `
 
 const gameBoard = new GameBoardImpl(input);
 gameBoard.printBoard();
+
+const gameState = gameBoard.currentState;
+const graph = parseGameStateToGraph(gameState);
+console.log(graph)

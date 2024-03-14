@@ -41,7 +41,7 @@ class Graph {
   }
 }
 
-function parseGameStateToGraph(gameState: GameState): Graph {
+export function parseGameStateToGraph(gameState: GameState): Graph {
   const graph = new Graph();
 
   // Add nodes (islands) to the graph
