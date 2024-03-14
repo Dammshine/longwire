@@ -74,11 +74,15 @@ export class GameBoardImpl implements GameBoard {
     // Define increments for iteration based on the direction of the bridge
     const [startX, startY] = start;
     const [endX, endY] = end;
-    const incrementX = isHorizontal ? 0 : (startX < endX ? 1 : -1);
+    const incrementX = isHorizontal ? 0 : startX < endX ? 1 : -1;
     const incrementY = isHorizontal ? (startY < endY ? 1 : -1) : 0;
 
     // Iterate over the path and update/create bridge cells
-    for (let x = startX, y = startY; x !== endX || y !== endY; x += incrementX, y += incrementY) {
+    for (
+      let x = startX, y = startY;
+      x !== endX || y !== endY;
+      x += incrementX, y += incrementY
+    ) {
       let cell = this.currentState.grid[x][y];
 
       if (cell.cellType === "Water") {
@@ -87,7 +91,7 @@ export class GameBoardImpl implements GameBoard {
           coord: [x, y],
           cellType: "Bridge",
           bridgeCount: bridge,
-          direction: direction
+          direction: direction,
         };
       } else if (cell.cellType === "Bridge" && cell.direction === direction) {
         // Increment the bridge count of an existing bridge cell
@@ -171,9 +175,16 @@ export class GameBoardImpl implements GameBoard {
             rowStr += cell.requestBridgeCount.toString(16);
             break;
           case "Bridge":
-            // Placeholder for bridge representation
-            rowStr +=
-              cell.bridgeCount === 1 ? "-" : cell.bridgeCount === 2 ? "=" : "E";
+            if (cell.direction === "horizontal") {
+              if (cell.bridgeCount === 1) rowStr += "-";
+              else if (cell.bridgeCount === 2) rowStr += "=";
+              else if (cell.bridgeCount === 3) rowStr += "E";
+            } else {
+              // Vertical
+              if (cell.bridgeCount === 1) rowStr += "|";
+              else if (cell.bridgeCount === 2) rowStr += '"';
+              else if (cell.bridgeCount === 3) rowStr += "#";
+            }
             break;
         }
       }
