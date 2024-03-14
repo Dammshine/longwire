@@ -62,6 +62,15 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
   ) => {
     const startId = coordToId(start.coord);
     const endId = coordToId(end.coord);
+
+    let sortedStartId = startId;
+    let sortedEndId = endId;
+
+    // Ensure startId is always the smaller (or alphabetically first) of the two
+    if (startId > endId) {
+      sortedStartId = endId;
+      sortedEndId = startId;
+    }
     graph.addEdge({
       start: startId,
       end: endId,
@@ -118,14 +127,11 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
         edgeWeight,
         Math.min(start.requestBridgeCount, end.requestBridgeCount)
       );
-      if (Math.abs(start.coord[1] - end.coord[1]) <= 1 || weight === 0) continue;
+      if (Math.abs(start.coord[1] - end.coord[1]) <= 1 || weight === 0)
+        continue;
 
       if (flag) {
-        addEdgeBetweenIslands(
-          start,
-          end,
-          weight
-        );
+        addEdgeBetweenIslands(start, end, weight);
       }
     }
   }
@@ -167,7 +173,6 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
           break;
         }
 
-
         if (inspectCell.cellType === "Bridge") {
           edgeWeight = Math.min(
             edgeWeight,
@@ -179,14 +184,11 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
         edgeWeight,
         Math.min(start.requestBridgeCount, end.requestBridgeCount)
       );
-      if (Math.abs(start.coord[0] - end.coord[0]) <= 1 || weight === 0) continue;
+      if (Math.abs(start.coord[0] - end.coord[0]) <= 1 || weight === 0)
+        continue;
 
       if (flag) {
-        addEdgeBetweenIslands(
-          start,
-          end,
-          weight
-        );
+        addEdgeBetweenIslands(start, end, weight);
       }
     }
   }
