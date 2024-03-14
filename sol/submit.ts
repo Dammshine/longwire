@@ -7,8 +7,9 @@ import { inspect } from "util";
 
 // Example usage
 const input = `
-3...3
-.....
+....
+2..2
+2..2
 `;
 
 const gameBoard = new GameBoardImpl(input);

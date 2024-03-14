@@ -117,6 +117,8 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
         }
       }
 
+      if ((start.coord[1] + 1) == end.coord[1]) continue;
+
       if (flag) {
         addEdgeBetweenIslands(
           start,
@@ -159,6 +161,15 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
           break;
         }
 
+        if (
+          inspectCell.cellType === "Bridge" &&
+          inspectCell.bridgeCount >= MAX_BRIDGE_SIZE
+        ) {
+          flag = false;
+          break;
+        }
+
+
         if (inspectCell.cellType === "Bridge") {
           edgeWeight = Math.min(
             edgeWeight,
@@ -166,6 +177,7 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
           );
         }
       }
+      if ((start.coord[0] + 1) == end.coord[0]) continue;
 
       if (flag) {
         addEdgeBetweenIslands(
