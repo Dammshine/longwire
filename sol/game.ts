@@ -1,10 +1,24 @@
-import { GameBoard, Cell, Coord, Bridge } from "./gameModel";
+import { GameBoard, GameState, Cell, Coord, Bridge } from "./gameModel";
+
+export function DeepCopyState(state: GameState): GameState {
+  return {
+    grid: state.grid.map(row => row.map(cell => ({ ...cell })))
+  };
+}
+
 
 export class GameBoardImpl implements GameBoard {
-  grid: Cell[][];
+  currentState: GameState;
+  history: GameState[] = [];
+
+  private saveState(): void {
+    this.history.push(DeepCopyState(this.currentState));
+  }
 
   constructor(input: string) {
-    this.grid = this.parseInput(input);
+    const initialGrid = this.parseInput(input);
+    this.currentState = { grid: initialGrid };
+    this.saveState();
   }
 
   private parseInput(input: string): Cell[][] {
@@ -16,7 +30,7 @@ export class GameBoardImpl implements GameBoard {
       for (const char of line) {
         if (char === '.') {
           row.push({ cellType: "Water" });
-        } else if (!isNaN(parseInt(char, 16))) { // Handles 0-9 and a-f for hex digits
+        } else if (!isNaN(parseInt(char, 16))) {
           row.push({ cellType: "Island", count: parseInt(char, 16) });
         } else {
           throw new Error(`Invalid character in input: ${char}`);
@@ -44,7 +58,7 @@ export class GameBoardImpl implements GameBoard {
   printBoard(): void {
     // Implementation for printing the board
     // Iterate through each cell and print the appropriate representation
-    for (const row of this.grid) {
+    for (const row of this.currentState.grid) {
       let rowStr = '';
       for (const cell of row) {
         switch (cell.cellType) {

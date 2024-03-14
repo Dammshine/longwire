@@ -19,8 +19,13 @@ export type Coord = [number, number];
 
 export const MAX_BRIDGE_SIZE = 3;
 
-export interface GameBoard {
+export interface GameState {
   grid: Cell[][];
+}
+export interface GameBoard {
+  currentState: GameState;
+  history: GameState[];
+
   addBridge(start: Coord, end: Coord, bridgeType: Bridge): void;
   verifyBoard(): boolean;
   printBoard(): void;
