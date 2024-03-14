@@ -1,8 +1,15 @@
-import { GameBoard, GameState, Cell, Coord, Bridge, IslandCell } from "./gameModel";
+import {
+  GameBoard,
+  GameState,
+  Cell,
+  Coord,
+  Bridge,
+  IslandCell,
+} from "./gameModel";
 
 export function DeepCopyState(state: GameState): GameState {
   return {
-    grid: state.grid.map(row => row.map(cell => ({ ...cell })))
+    grid: state.grid.map((row) => row.map((cell) => ({ ...cell }))),
   };
 }
 
@@ -21,21 +28,25 @@ export class GameBoardImpl implements GameBoard {
   }
 
   private parseInput(input: string): Cell[][] {
-    const lines = input.split('\n').filter(line => line.trim() !== '');
+    const lines = input.split("\n").filter((line) => line.trim() !== "");
     const grid: Cell[][] = [];
 
     for (let rowIndex = 0; rowIndex < lines.length; rowIndex++) {
       const line = lines[rowIndex];
       const row: Cell[] = [];
-      
+
       for (let colIndex = 0; colIndex < line.length; colIndex++) {
         const char = line[colIndex];
         const coord: Coord = [rowIndex, colIndex];
-  
-        if (char === '.') {
+
+        if (char === ".") {
           row.push({ coord, cellType: "Water" });
         } else if (!isNaN(parseInt(char, 16))) {
-          row.push({ coord, cellType: "Island", requestBridgeCount: parseInt(char, 16) });
+          row.push({
+            coord,
+            cellType: "Island",
+            requestBridgeCount: parseInt(char, 16),
+          });
         } else {
           throw new Error(`Invalid character in input: ${char}`);
         }
@@ -68,20 +79,43 @@ export class GameBoardImpl implements GameBoard {
   }
 
   isValidCoord(coord: Coord): boolean {
-    return coord[0] >= 0 && coord[0] < this.currentState.grid.length &&
-      coord[1] >= 0 && coord[1] < this.currentState.grid[0].length;
+    return (
+      coord[0] >= 0 &&
+      coord[0] < this.currentState.grid.length &&
+      coord[1] >= 0 &&
+      coord[1] < this.currentState.grid[0].length
+    );
   }
 
   verifyIsland(cell: IslandCell): boolean {
     let coord = cell.coord;
+
     let bridgeCount = 0;
-    const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]]; // Down, Right, Up, Left
-    for (const [dx, dy] of directions) {
-      let x = coord[0];
-      let y = coord[1];
-      let cell = this.currentState.grid[x][y];
-      if (this.isValidCoord([x + dx, y + dy]) && cell.cellType === "Bridge") {
-        bridgeCount += cell.bridgeCount;
+    const directions = {
+      right: [0, 1],
+      down: [1, 0],
+      left: [0, -1],
+      up: [-1, 0],
+    };
+
+    for (const direction in directions) {
+      const [dx, dy] = directions[direction];
+      let [x, y] = [coord[0] + dx, coord[1] + dy];
+
+      if (!this.isValidCoord([x, y])) {
+        continue;
+      }
+
+      let nextCell = this.currentState.grid[x][y];
+      if (nextCell.cellType === "Bridge") {
+        if (
+          ((direction === "right" || direction === "left") &&
+            nextCell.direction === "horizontal") ||
+          ((direction === "up" || direction === "down") &&
+            nextCell.direction === "vertical")
+        ) {
+          bridgeCount += nextCell.bridgeCount;
+        }
       }
     }
 
@@ -92,18 +126,19 @@ export class GameBoardImpl implements GameBoard {
     // Implementation for printing the board
     // Iterate through each cell and print the appropriate representation
     for (const row of this.currentState.grid) {
-      let rowStr = '';
+      let rowStr = "";
       for (const cell of row) {
         switch (cell.cellType) {
           case "Water":
-            rowStr += '.';
+            rowStr += ".";
             break;
           case "Island":
             rowStr += cell.requestBridgeCount.toString(16);
             break;
           case "Bridge":
             // Placeholder for bridge representation
-            rowStr += cell.bridgeCount === 1 ? '-' : (cell.bridgeCount === 2 ? '=' : 'E');
+            rowStr +=
+              cell.bridgeCount === 1 ? "-" : cell.bridgeCount === 2 ? "=" : "E";
             break;
         }
       }

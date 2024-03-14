@@ -12,6 +12,7 @@ export type IslandCell = CellBase & {
 export type BridgeCell = CellBase & {
   cellType: "Bridge";
   bridgeCount: number;
+  direction: "horizontal" | "vertical";
 }
 
 export type Cell = WaterCell | IslandCell | BridgeCell;
