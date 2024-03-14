@@ -14,6 +14,7 @@ export class GameBoardImpl implements GameBoard {
 
   private saveState(): void {
     this.history.push(DeepCopyState(this.currentState));
+    this.currentState = this.history[this.history.length - 1];
   }
 
   constructor(input: string) {
@@ -138,38 +139,7 @@ export class GameBoardImpl implements GameBoard {
   }
 
   verifyIsland(cell: IslandCell): boolean {
-    let coord = cell.coord;
-
-    let bridgeCount = 0;
-    const directions = {
-      right: [0, 1],
-      down: [1, 0],
-      left: [0, -1],
-      up: [-1, 0],
-    };
-
-    for (const direction in directions) {
-      const [dx, dy] = directions[direction];
-      let [x, y] = [coord[0] + dx, coord[1] + dy];
-
-      if (!isValidCoord([x, y], this.currentState)) {
-        continue;
-      }
-
-      let nextCell = this.currentState.grid[x][y];
-      if (nextCell.cellType === "Bridge") {
-        if (
-          ((direction === "right" || direction === "left") &&
-            nextCell.direction === "horizontal") ||
-          ((direction === "up" || direction === "down") &&
-            nextCell.direction === "vertical")
-        ) {
-          bridgeCount += nextCell.bridgeCount;
-        }
-      }
-    }
-
-    return bridgeCount === cell.requestBridgeCount;
+    return cell.requestBridgeCount === 0;
   }
 
   printBoard(): void {

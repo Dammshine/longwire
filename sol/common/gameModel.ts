@@ -58,5 +58,5 @@ export function printOperations(operations: Operation[]): void {
 
 function coordToString(coord: Coord): string {
   // Converts a coordinate array to a string representation
-  return `(${coord[0]}, ${coord[1]})`;
+  return `(${coord[1]}, ${coord[0]})`;
 }

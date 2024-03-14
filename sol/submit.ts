@@ -30,10 +30,13 @@ async function GameStart() {
     // console.log(inspect(gameBoard.currentState, { depth: 5 }));
 
     if (operations.length === 0) {
+      console.log("No moves possible. Reverting last change.");
       gameBoard.revertLastChange(); // Rollback if no moves are possible
     } else {
       printOperations(operations);
-      gameBoard.addBridges(operations);
+      if (!gameBoard.addBridges(operations)) {
+        console.log("Applied operation failed. Debug. ");
+      }
     }
 
     gameBoard.printBoard();

@@ -55,7 +55,7 @@ export function VerifyOperation(
 
     // Check for existing bridges in the path
     if (cell.cellType === "Bridge") {
-      if (cell.direction !== (isHorizontal ? "horizontal" : "vertical")) {
+      if (cell.direction !== (isHorizontal ? "vertical" : "horizontal")) {
         return false;
       }
 
