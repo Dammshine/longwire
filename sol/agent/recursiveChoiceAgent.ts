@@ -13,21 +13,17 @@ export class RecursiveChoiceAgent implements AgentBase {
 
   makeMove(gameBoard: GameBoard): Operation[] {
     const gameState = gameBoard.currentState;
-    const gameStateString = JSON.stringify(gameState); // Unique string representation of the game state
+    const gameStateString = JSON.stringify(gameState);
     const graph = parseGameStateToGraph(gameState);
     let edges = this.getAllEdges(graph);
 
     if (edges.length === 0) {
-      return []; // No available moves
+      return [];
     }
 
-    // Sort edges based on a certain criteria (e.g., by distance, or by some heuristic)
     edges = this.sortEdges(edges);
-
-    // Check if this game state has been encountered before
     if (this.choiceHistory.has(gameStateString)) {
       this.currentChoiceIndex = this.choiceHistory.get(gameStateString)!;
-      // Increment choice index for the next time
       this.choiceHistory.set(gameStateString, this.currentChoiceIndex + 1);
     } else {
       this.choiceHistory.set(gameStateString, 0);
@@ -35,11 +31,9 @@ export class RecursiveChoiceAgent implements AgentBase {
     }
 
     if (this.currentChoiceIndex >= edges.length) {
-      // All options explored for this state
       return [];
     }
 
-    // Select the edge based on the current choice index
     const selectedEdge = edges[this.currentChoiceIndex];
     return [this.edgeToOperation(selectedEdge)];
   }
@@ -53,7 +47,11 @@ export class RecursiveChoiceAgent implements AgentBase {
   }
 
   private sortEdges(edges: Edge[]): Edge[] {
-    return edges.sort(/* sorting function here */);
+    return edges.sort((a, b) => {
+      const startCompare = a.start.localeCompare(b.start);
+      if (startCompare !== 0) return startCompare;
+      return a.end.localeCompare(b.end);
+    });
   }
 
   private edgeToOperation(edge: Edge): Operation {

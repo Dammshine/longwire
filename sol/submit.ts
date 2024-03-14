@@ -1,6 +1,7 @@
 import { GameBoardImpl } from "./game/game";
 import { AgentBase } from "./agent/agent";
 import { RandomAgent } from "./agent/randomAgent";
+import {RecursiveChoiceAgent} from "./agent/recursiveChoiceAgent";
 import { printOperations } from "./common/gameModel";
 import { readFile, writeFile } from "fs/promises";
 import { inspect } from "util";
@@ -16,7 +17,7 @@ const input = `
 `;
 
 const gameBoard = new GameBoardImpl(input);
-const agent: AgentBase = new RandomAgent();
+const agent: AgentBase = new RecursiveChoiceAgent();
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -43,7 +44,7 @@ async function GameStart() {
     }
 
     gameBoard.printBoard();
-    await sleep(1000);
+    await sleep(100);
   }
   console.log("Game complete!");
   generateGameCompleteFile();
