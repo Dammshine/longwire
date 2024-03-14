@@ -1,4 +1,4 @@
-import { GameState, IslandCell, MAX_BRIDGE_SIZE } from "./gameModel";
+import { Coord, GameState, IslandCell, MAX_BRIDGE_SIZE } from "./gameModel";
 
 export type NodeId = string;
 
@@ -12,7 +12,9 @@ export interface Edge {
   end: NodeId;
   maxWeight: number;
 }
-
+const coordToId = (coord: Coord): string => {
+  return `${coord[0]},${coord[1]}`;
+};
 export class Graph {
   nodes: Map<NodeId, Node>;
   adjacencyList: Map<NodeId, Edge[]>;
@@ -48,8 +50,10 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
   gameState.grid.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
       if (cell.cellType === "Island") {
-        const nodeId = `${rowIndex},${colIndex}`;
-        graph.addNode({ id: nodeId, weight: cell.requestBridgeCount });
+        graph.addNode({
+          id: coordToId(cell.coord),
+          weight: cell.requestBridgeCount,
+        });
       }
     });
   });
@@ -59,8 +63,8 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
     end: IslandCell,
     edgeWeight: number
   ) => {
-    const startId = `${start.coord[0]},${start.coord[1]}`;
-    const endId = `${end.coord[0]},${end.coord[1]}`;
+    const startId = coordToId(start.coord);
+    const endId = coordToId(end.coord);
     graph.addEdge({
       start: startId,
       end: endId,
@@ -73,7 +77,7 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
   for (let i = 0; i < gameState.grid.length; i++) {
     // Queue for each row
     let queue: IslandCell[] = [];
-    for (let j = 0; j < gameState.grid.length; j++) {
+    for (let j = 0; j < gameState.grid[0].length; j++) {
       let inspectCell = gameState.grid[i][j];
       if (inspectCell.cellType === "Island") {
         queue.push(inspectCell);
@@ -91,7 +95,7 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
         let inspectCell = gameState.grid[i][k];
         if (
           inspectCell.cellType === "Bridge" &&
-          inspectCell.direction === "horizontal"
+          inspectCell.direction === "vertical"
         ) {
           flag = false;
           break;
@@ -149,7 +153,7 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
 
         if (
           inspectCell.cellType === "Bridge" &&
-          inspectCell.direction === "vertical"
+          inspectCell.direction === "horizontal"
         ) {
           flag = false;
           break;

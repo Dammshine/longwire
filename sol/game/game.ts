@@ -69,13 +69,13 @@ export class GameBoardImpl implements GameBoard {
   private applyOperation(operation: Operation): void {
     const { start, end, bridge } = operation;
     const isHorizontal = start[1] === end[1];
-    const direction = isHorizontal ? "horizontal" : "vertical";
+    const direction = isHorizontal ? "vertical" : "horizontal";
 
     // Define increments for iteration based on the direction of the bridge
     const [startX, startY] = start;
     const [endX, endY] = end;
-    const incrementX = isHorizontal ? 0 : startX < endX ? 1 : -1;
-    const incrementY = isHorizontal ? (startY < endY ? 1 : -1) : 0;
+    const incrementX = isHorizontal ? startX < endX ? 1 : -1 : 0;
+    const incrementY = isHorizontal ? 0 : (startY < endY ? 1 : -1);
 
     // Iterate over the path and update/create bridge cells
     for (
@@ -98,6 +98,16 @@ export class GameBoardImpl implements GameBoard {
         // Increment the bridge count of an existing bridge cell
         cell.bridgeCount += bridge;
       }
+    }
+
+    // Update the start and end cells
+    let startCell = this.currentState.grid[startX][startY];
+    let endCell = this.currentState.grid[endX][endY];
+    if (startCell.cellType === "Island") {
+      startCell.requestBridgeCount -= bridge;
+    }
+    if (endCell.cellType === "Island") {
+      endCell.requestBridgeCount -= bridge;
     }
   }
 

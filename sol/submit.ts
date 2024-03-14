@@ -1,19 +1,14 @@
 import { GameBoardImpl } from "./game/game";
 import { AgentBase } from "./agent/agent";
 import { RandomAgent } from "./agent/randomAgent";
+import { printOperations } from "./common/gameModel";
+import { readFile, writeFile } from "fs/promises";
+import { inspect } from "util";
 
 // Example usage
 const input = `
-.1...6...7....4.4.2.
-..4.2..2...3.8...6.2
-.....2..............
-5.c.7..a.a..5.6..8.5
-.............2......
-...5...9.a..8.b.8.4.
-4.5................3
-....2..4..1.5...2...
-.2.7.4...7.2..5...3.
-............4..3.1.2
+3...3
+.....
 `;
 
 const gameBoard = new GameBoardImpl(input);
@@ -30,11 +25,14 @@ async function GameStart() {
   gameBoard.printBoard();
 
   while (!gameBoard.verifyCompleteState()) {
+    console.clear();
     const operations = agent.makeMove();
+    // console.log(inspect(gameBoard.currentState, { depth: 5 }));
 
     if (operations.length === 0) {
       gameBoard.revertLastChange(); // Rollback if no moves are possible
     } else {
+      printOperations(operations);
       gameBoard.addBridges(operations);
     }
 
@@ -42,7 +40,16 @@ async function GameStart() {
     await sleep(1000);
   }
   console.log("Game complete!");
+  generateGameCompleteFile();
 }
 
 GameStart();
 
+function generateGameCompleteFile() {
+  const gameData = {
+    board: gameBoard.currentState,
+    history: gameBoard.history,
+  };
+
+  writeFile("gameComplete.json", JSON.stringify(gameData, null, 2), "utf8");
+}

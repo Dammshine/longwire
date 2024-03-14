@@ -1,0 +1,404 @@
+{
+  "board": {
+    "grid": [
+      [
+        {
+          "coord": [
+            0,
+            0
+          ],
+          "cellType": "Island",
+          "requestBridgeCount": 0
+        },
+        {
+          "coord": [
+            0,
+            1
+          ],
+          "cellType": "Water"
+        },
+        {
+          "coord": [
+            0,
+            2
+          ],
+          "cellType": "Water"
+        },
+        {
+          "coord": [
+            0,
+            3
+          ],
+          "cellType": "Water"
+        },
+        {
+          "coord": [
+            0,
+            4
+          ],
+          "cellType": "Island",
+          "requestBridgeCount": 0
+        }
+      ],
+      [
+        {
+          "coord": [
+            1,
+            0
+          ],
+          "cellType": "Water"
+        },
+        {
+          "coord": [
+            1,
+            1
+          ],
+          "cellType": "Water"
+        },
+        {
+          "coord": [
+            1,
+            2
+          ],
+          "cellType": "Water"
+        },
+        {
+          "coord": [
+            1,
+            3
+          ],
+          "cellType": "Water"
+        },
+        {
+          "coord": [
+            1,
+            4
+          ],
+          "cellType": "Water"
+        }
+      ]
+    ]
+  },
+  "history": [
+    {
+      "grid": [
+        [
+          {
+            "coord": [
+              0,
+              0
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 3
+          },
+          {
+            "coord": [
+              0,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              4
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 3
+          }
+        ],
+        [
+          {
+            "coord": [
+              1,
+              0
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              4
+            ],
+            "cellType": "Water"
+          }
+        ]
+      ]
+    },
+    {
+      "grid": [
+        [
+          {
+            "coord": [
+              0,
+              0
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 3
+          },
+          {
+            "coord": [
+              0,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              4
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 3
+          }
+        ],
+        [
+          {
+            "coord": [
+              1,
+              0
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              4
+            ],
+            "cellType": "Water"
+          }
+        ]
+      ]
+    },
+    {
+      "grid": [
+        [
+          {
+            "coord": [
+              0,
+              0
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 2
+          },
+          {
+            "coord": [
+              0,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              4
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 2
+          }
+        ],
+        [
+          {
+            "coord": [
+              1,
+              0
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              4
+            ],
+            "cellType": "Water"
+          }
+        ]
+      ]
+    },
+    {
+      "grid": [
+        [
+          {
+            "coord": [
+              0,
+              0
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 1
+          },
+          {
+            "coord": [
+              0,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              0,
+              4
+            ],
+            "cellType": "Island",
+            "requestBridgeCount": 1
+          }
+        ],
+        [
+          {
+            "coord": [
+              1,
+              0
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              1
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              2
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              3
+            ],
+            "cellType": "Water"
+          },
+          {
+            "coord": [
+              1,
+              4
+            ],
+            "cellType": "Water"
+          }
+        ]
+      ]
+    }
+  ]
+}
