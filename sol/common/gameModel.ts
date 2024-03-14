@@ -16,7 +16,7 @@ export type BridgeCell = CellBase & {
 };
 
 export type Cell = WaterCell | IslandCell | BridgeCell;
-export type Bridge = "None" | "Single" | "Double" | "Triple";
+export type Bridge = number;
 export type Coord = [number, number];
 
 export const MAX_BRIDGE_SIZE = 3;

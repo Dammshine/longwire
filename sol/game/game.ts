@@ -5,7 +5,7 @@ import {
   Coord,
   IslandCell,
   Operation,
-} from "./gameModel";
+} from "../common/gameModel";
 import { DeepCopyState, VerifyOperation, isValidCoord } from "./gameUtil";
 
 export class GameBoardImpl implements GameBoard {

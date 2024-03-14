@@ -1,4 +1,4 @@
-import { GameBoardImpl } from "./game";
+import { GameBoardImpl } from "./game/game";
 
 // Example usage
 const input = `

@@ -1,4 +1,4 @@
-import { Coord, GameState, MAX_BRIDGE_SIZE, Operation } from "./gameModel";
+import { Coord, GameState, MAX_BRIDGE_SIZE, Operation } from "../common/gameModel";
 
 export function DeepCopyState(state: GameState): GameState {
   return {
