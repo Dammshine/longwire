@@ -1,11 +1,10 @@
-import { GameBoard, GameState, Cell, Coord, Bridge } from "./gameModel";
+import { GameBoard, GameState, Cell, Coord, Bridge, IslandCell } from "./gameModel";
 
 export function DeepCopyState(state: GameState): GameState {
   return {
     grid: state.grid.map(row => row.map(cell => ({ ...cell })))
   };
 }
-
 
 export class GameBoardImpl implements GameBoard {
   currentState: GameState;
@@ -25,13 +24,18 @@ export class GameBoardImpl implements GameBoard {
     const lines = input.split('\n').filter(line => line.trim() !== '');
     const grid: Cell[][] = [];
 
-    for (const line of lines) {
+    for (let rowIndex = 0; rowIndex < lines.length; rowIndex++) {
+      const line = lines[rowIndex];
       const row: Cell[] = [];
-      for (const char of line) {
+      
+      for (let colIndex = 0; colIndex < line.length; colIndex++) {
+        const char = line[colIndex];
+        const coord: Coord = [rowIndex, colIndex];
+  
         if (char === '.') {
-          row.push({ cellType: "Water" });
+          row.push({ coord, cellType: "Water" });
         } else if (!isNaN(parseInt(char, 16))) {
-          row.push({ cellType: "Island", count: parseInt(char, 16) });
+          row.push({ coord, cellType: "Island", requestBridgeCount: parseInt(char, 16) });
         } else {
           throw new Error(`Invalid character in input: ${char}`);
         }
@@ -43,16 +47,45 @@ export class GameBoardImpl implements GameBoard {
   }
 
   addBridge(start: Coord, end: Coord, bridgeType: Bridge): void {
-    // Implementation for adding a bridge goes here
-    // You need to validate start and end coordinates, update the bridge cells, and update adjacent islands
-    // This is a simplified placeholder
     console.log(`Added ${bridgeType} bridge from ${start} to ${end}`);
   }
 
-  verifyBoard(): boolean {
-    // Implementation for verifying if the board is in a valid state goes here
-    // Check if all islands have the correct number of bridges and bridges follow the game rules
-    return true; // Placeholder return
+  /**
+   * @returns True if the game is completed.
+   */
+  verifyCompleteState(): boolean {
+    for (let row = 0; row < this.currentState.grid.length; row++) {
+      for (let col = 0; col < this.currentState.grid[row].length; col++) {
+        const cell = this.currentState.grid[row][col];
+        if (cell.cellType === "Island") {
+          if (!this.verifyIsland(cell)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  isValidCoord(coord: Coord): boolean {
+    return coord[0] >= 0 && coord[0] < this.currentState.grid.length &&
+      coord[1] >= 0 && coord[1] < this.currentState.grid[0].length;
+  }
+
+  verifyIsland(cell: IslandCell): boolean {
+    let coord = cell.coord;
+    let bridgeCount = 0;
+    const directions = [[1, 0], [0, 1], [-1, 0], [0, -1]]; // Down, Right, Up, Left
+    for (const [dx, dy] of directions) {
+      let x = coord[0];
+      let y = coord[1];
+      let cell = this.currentState.grid[x][y];
+      if (this.isValidCoord([x + dx, y + dy]) && cell.cellType === "Bridge") {
+        bridgeCount += cell.bridgeCount;
+      }
+    }
+
+    return bridgeCount === cell.requestBridgeCount;
   }
 
   printBoard(): void {
@@ -66,7 +99,7 @@ export class GameBoardImpl implements GameBoard {
             rowStr += '.';
             break;
           case "Island":
-            rowStr += cell.count.toString(16);
+            rowStr += cell.requestBridgeCount.toString(16);
             break;
           case "Bridge":
             // Placeholder for bridge representation

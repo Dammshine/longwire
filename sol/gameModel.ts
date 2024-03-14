@@ -1,14 +1,15 @@
 export type CellBase = {
+  coord: Coord;
   cellType: string;
 };
-export type WaterCell = {
+export type WaterCell = CellBase & {
   cellType: "Water";
 }
-export type IslandCell = {
+export type IslandCell = CellBase & {
   cellType: "Island";
-  count: number;
+  requestBridgeCount: number;
 }
-export type BridgeCell = {
+export type BridgeCell = CellBase & {
   cellType: "Bridge";
   bridgeCount: number;
 }
@@ -27,7 +28,7 @@ export interface GameBoard {
   history: GameState[];
 
   addBridge(start: Coord, end: Coord, bridgeType: Bridge): void;
-  verifyBoard(): boolean;
+  verifyCompleteState(): boolean;
   printBoard(): void;
 }
 
