@@ -7,14 +7,16 @@ import { inspect } from "util";
 
 // Example usage
 const input = `
-....
-2..2
-2..2
+6.7.4.
+......
+5.3...
+....3.
+4.4...
+.2..4.
 `;
 
 const gameBoard = new GameBoardImpl(input);
 const agent: AgentBase = new RandomAgent();
-agent.initialize(gameBoard);
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -27,7 +29,7 @@ async function GameStart() {
 
   while (!gameBoard.verifyCompleteState()) {
     console.clear();
-    const operations = agent.makeMove();
+    const operations = agent.makeMove(gameBoard);
     // console.log(inspect(gameBoard.currentState, { depth: 5 }));
 
     if (operations.length === 0) {

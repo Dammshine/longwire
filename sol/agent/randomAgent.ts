@@ -3,19 +3,15 @@ import { Graph, Edge, parseGameStateToGraph } from "../common/graph"
 import { AgentBase } from "../agent/agent";
 
 export class RandomAgent implements AgentBase {
-  gameBoard: GameBoard;
-  initialize(gameBoard: GameBoard): void {
-    this.gameBoard = gameBoard;
-  }
-
-  makeMove(): Operation[] {
-    const gameState = this.gameBoard.currentState;
+  makeMove(gameBoard: GameBoard): Operation[] {
+    const gameState = gameBoard.currentState;
     const graph = parseGameStateToGraph(gameState);
     const edges = this.getAllEdges(graph);
 
     if (edges.length === 0) {
       return []; // No available moves
     }
+    console.log(edges);
 
     // Randomly pick an edge
     const randomEdge = edges[Math.floor(Math.random() * edges.length)];

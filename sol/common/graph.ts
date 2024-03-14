@@ -37,9 +37,6 @@ export class Graph {
       throw new Error(`No node found with id ${edge.end}`);
     }
     this.adjacencyList.get(edge.start).push(edge);
-    this.adjacencyList
-      .get(edge.end)
-      .push({ ...edge, start: edge.end, end: edge.start });
   }
 }
 
@@ -117,16 +114,17 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
         }
       }
 
-      if ((start.coord[1] + 1) == end.coord[1]) continue;
+      let weight = Math.min(
+        edgeWeight,
+        Math.min(start.requestBridgeCount, end.requestBridgeCount)
+      );
+      if (Math.abs(start.coord[1] - end.coord[1]) <= 1 || weight === 0) continue;
 
       if (flag) {
         addEdgeBetweenIslands(
           start,
           end,
-          Math.min(
-            edgeWeight,
-            Math.min(start.requestBridgeCount, end.requestBridgeCount)
-          )
+          weight
         );
       }
     }
@@ -177,16 +175,17 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
           );
         }
       }
-      if ((start.coord[0] + 1) == end.coord[0]) continue;
+      let weight = Math.min(
+        edgeWeight,
+        Math.min(start.requestBridgeCount, end.requestBridgeCount)
+      );
+      if (Math.abs(start.coord[0] - end.coord[0]) <= 1 || weight === 0) continue;
 
       if (flag) {
         addEdgeBetweenIslands(
           start,
           end,
-          Math.min(
-            edgeWeight,
-            Math.min(start.requestBridgeCount, end.requestBridgeCount)
-          )
+          weight
         );
       }
     }
