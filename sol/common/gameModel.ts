@@ -41,3 +41,22 @@ export interface GameBoard {
   verifyCompleteState(): boolean;
   printBoard(): void;
 }
+
+export function printOperations(operations: Operation[]): void {
+  if (operations.length === 0) {
+      console.log("No operations to perform.");
+      return;
+  }
+
+  console.log("Operations:");
+  operations.forEach((op, index) => {
+      const start = coordToString(op.start);
+      const end = coordToString(op.end);
+      console.log(`  Operation ${index + 1}: Start at ${start}, End at ${end}, Bridges: ${op.bridge}`);
+  });
+}
+
+function coordToString(coord: Coord): string {
+  // Converts a coordinate array to a string representation
+  return `(${coord[0]}, ${coord[1]})`;
+}

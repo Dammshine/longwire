@@ -1,19 +1,19 @@
 import { GameState, IslandCell, MAX_BRIDGE_SIZE } from "./gameModel";
 
-type NodeId = string;
+export type NodeId = string;
 
-interface Node {
+export interface Node {
   id: NodeId;
   weight: number;
 }
 
-interface Edge {
+export interface Edge {
   start: NodeId;
   end: NodeId;
   maxWeight: number;
 }
 
-class Graph {
+export class Graph {
   nodes: Map<NodeId, Node>;
   adjacencyList: Map<NodeId, Edge[]>;
 
@@ -131,7 +131,7 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
     // Queue for each column
     let queue: IslandCell[] = [];
     for (let rowIndex = 0; rowIndex < gameState.grid.length; rowIndex++) {
-      let inspectCell = gameState.grid[rowIndex][colIndex] as IslandCell;
+      let inspectCell = gameState.grid[rowIndex][colIndex];
       if (inspectCell.cellType === "Island") {
         queue.push(inspectCell);
       }

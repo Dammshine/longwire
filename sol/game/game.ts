@@ -83,6 +83,7 @@ export class GameBoardImpl implements GameBoard {
       x !== endX || y !== endY;
       x += incrementX, y += incrementY
     ) {
+      if (!isValidCoord([x, y], this.currentState)) break;
       let cell = this.currentState.grid[x][y];
 
       if (cell.cellType === "Water") {

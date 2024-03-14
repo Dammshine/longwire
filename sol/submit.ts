@@ -1,5 +1,6 @@
-import { parseGameStateToGraph } from "./common/graph";
 import { GameBoardImpl } from "./game/game";
+import { AgentBase } from "./agent/agent";
+import { RandomAgent } from "./agent/randomAgent";
 
 // Example usage
 const input = `
@@ -16,8 +17,32 @@ const input = `
 `;
 
 const gameBoard = new GameBoardImpl(input);
-gameBoard.printBoard();
+const agent: AgentBase = new RandomAgent();
+agent.initialize(gameBoard);
 
-const gameState = gameBoard.currentState;
-const graph = parseGameStateToGraph(gameState);
-console.log(graph)
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function GameStart() {
+  gameBoard.printBoard();
+
+  while (!gameBoard.verifyCompleteState()) {
+    const operations = agent.makeMove();
+
+    if (operations.length === 0) {
+      gameBoard.revertLastChange(); // Rollback if no moves are possible
+    } else {
+      gameBoard.addBridges(operations);
+    }
+
+    gameBoard.printBoard();
+    await sleep(1000);
+  }
+  console.log("Game complete!");
+}
+
+GameStart();
+
