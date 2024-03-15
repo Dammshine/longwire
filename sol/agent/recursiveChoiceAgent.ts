@@ -40,6 +40,10 @@ export class RecursiveChoiceAgent implements AgentBase {
       return earlyReturn.map((edge) => this.edgeToOperation(edge));
     }
 
+    if (this.checkSubgraphsForEarlyReturn(graph) === false) {
+      return [];
+    }
+
     let edges = this.getAllEdges(graph);
     if (edges.length === 0) {
       return [];
@@ -97,6 +101,43 @@ export class RecursiveChoiceAgent implements AgentBase {
     }
     return true;
   }
+
+  // TODO: IDK how many optimization it is
+  private checkSubgraphsForEarlyReturn(graph: Graph): boolean {
+    const subgraphs = identifyAndSortSubgraphs(graph);
+    
+    for (const subgraphEdges of subgraphs) {
+      let totalMaxEdgeWeight = 0;
+      let nodeWeights = new Map<string, number>();
+  
+      subgraphEdges.forEach(edge => {
+        totalMaxEdgeWeight += edge.maxWeight;
+        nodeWeights.set(edge.start, (nodeWeights.get(edge.start) || 0) + edge.maxWeight);
+        nodeWeights.set(edge.end, (nodeWeights.get(edge.end) || 0) + edge.maxWeight);
+      });
+      
+      if (nodeWeights.size === 2) {
+        // Special case: If the subgraph consists of only two nodes
+        const weights = Array.from(nodeWeights.values());
+        if (weights[0] !== weights[1]) {
+          return false; // Different weights, no solution
+        }
+      }
+  
+      let weightCount = 0;
+      for (const [nodeId, weight] of nodeWeights) {
+        const node = graph.getNode(nodeId);
+        weightCount += weight;
+      }
+
+      if (weightCount > 2 * totalMaxEdgeWeight) {
+        return false;
+      }
+    }
+  
+    return true;
+  }
+  
 
   // TODO: First optimization: Prioritize those edge only have one edge
   //    => so that if it don't get resolved, solve other edges will make it's situation worse

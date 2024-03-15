@@ -1,66 +1,169 @@
 import { GameBoardImpl } from "./game/game";
-import { AgentBase } from "./agent/agent";
-import { RandomAgent } from "./agent/randomAgent";
 import {RecursiveChoiceAgent} from "./agent/recursiveChoiceAgent";
-import { printOperations } from "./common/gameModel";
-import { readFile, writeFile } from "fs/promises";
-import { inspect } from "util";
+import { promises as fs } from 'fs';
 
-// Example usage
-const input = `
-1...2..2.3
-..2...4.1.
-.......1.5
-..........
-6.6.7.9..4
-........3.
-.5..7....1
-......6.6.
-3.........
-.3..6.7.4.
-`;
+async function runTestCases(testCases: string[]) {
+  await clearDirectory('./result');
+  let results = [];
+  const agent = new RecursiveChoiceAgent();
 
-const gameBoard = new GameBoardImpl(input);
-const agent: AgentBase = new RecursiveChoiceAgent();
+  let i = 0;
+  for (let input of testCases) {
+    const gameBoard = new GameBoardImpl(input);
 
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
-async function GameStart() {
-  gameBoard.printBoard();
-
-  while (!gameBoard.verifyCompleteState()) {
-    console.clear();
-    const operations = agent.makeMove(gameBoard);
-    // console.log(inspect(gameBoard.currentState, { depth: 5 }));
-
-    if (operations.length === 0) {
-      console.log("No moves possible. Reverting last change.");
-      gameBoard.revertLastChange(); // Rollback if no moves are possible
-    } else {
-      printOperations(operations);
-      if (!gameBoard.addBridges(operations)) {
-        console.log("Applied operation failed. Debug. ");
+    let moves = [];
+    while (!gameBoard.verifyCompleteState()) {
+      //console.clear();
+      const operations = agent.makeMove(gameBoard);
+      if (operations.length === 0) {
+        gameBoard.revertLastChange();
+      } else {
+        moves.push(operations);
+        gameBoard.addBridges(operations);
       }
+
+      // gameBoard.printBoard();
     }
 
-    gameBoard.printBoard();
-    //await sleep(10);
+    const dir = './result';
+    try {
+      // Create the directory if it doesn't exist
+      await fs.mkdir(dir, { recursive: true });
+
+      // Write the file
+      const filePath = `${dir}/${i++}.in`;
+      await fs.writeFile(filePath, gameBoard.printBoard(true), "utf8");
+      console.log(`Results written to ${filePath}`);
+    } catch (err) {
+      console.error('Error writing file:', err);
+    }
+
+    results.push({
+      input,
+      moves,
+      finalBoard: gameBoard.currentState
+    });
   }
-  console.log("Game complete!");
-  generateGameCompleteFile();
+
+  return results;
 }
 
-GameStart();
+// Example usage with an array of game inputs
+const gameInputs = [
+`.2.
+...
+.2.
+`,
+`.4..4
+...2.
+.....
+.3.4.
+....1`,
+`3.4.7.5
+.....2.
+7.8.4.5
+.......
+7.a..4.
+.......
+..9.9.8
+.......
+4...5.4
+..6....
+....2.2
+4.7..2.`,
+`......
+6.7..4
+......
+......
+5.7..5
+......
+......
+5.5..3
+....2.
+..1...
+7...7.
+......
+2.1.2.
+.....1`,
+`6...8..6.7.4
+..3.........
+4........1..
+....9..9...4
+............
+....9..9...7
+............
+5.6.5.4...2.
+.3..........
+3..3..7..7.8
+..4.3.......
+.5.3..3..4.3`,
+`.3.8..6.4..3
+.......1..2.
+5..6..7..2..
+............
+5.8.7.9.5.5.
+............
+.......2..4.
+6.9.9.9.5...
+............
+6.9.7.5.4.2.
+............
+....3.6..2..
+..2.........`,
+`.3...3........
+...2...2..4..3
+..............
+.4.7.5..1.....
+...........4.6
+......1..3....
+.2............
+...5.6.4.5....
+..............
+.5.9..8..6.6.8
+..............
+........3..4..
+.4.6..5......4
+..............`,
+`5........7...3.
+..6....4...2..2
+...1..3........
+7.8.2..4.c.8.3.
+............3.6
+6.9.7.6..8.....
+............3.5
+4.4........5...
+.2..9.6..8.....
+...........3...
+4...6..1.8..4..
+..1...7.3......
+..........2.5.3
+4.7.8.6..7.4.1.`,
+`3..3...7.8.8.7.6
+........1.......
+7...8.6..4.6.5.8
+.......2........
+7.9.9.8.3..3.4.5
+................
+......8.5.6.4..3
+.........3.1....
+7.9.....1.2.2..5
+......9..a.7.7..
+7.9.............
+......9..7...a.6
+................
+......8..6...9.3
+..3.............
+5...7.7..7...7.2`
+];
 
-function generateGameCompleteFile() {
-  const gameData = {
-    board: gameBoard.currentState,
-    history: gameBoard.history,
-  };
-
-  writeFile("gameComplete.json", JSON.stringify(gameData, null, 2), "utf8");
+async function clearDirectory(dir) {
+  try {
+    const files = await fs.readdir(dir);
+    const unlinkPromises = files.map(filename => fs.unlink(`${dir}/${filename}`));
+    return Promise.all(unlinkPromises);
+  } catch (err) {
+    console.error(`Error clearing directory ${dir}:`, err);
+  }
 }
+
+runTestCases(gameInputs);

@@ -142,9 +142,11 @@ export class GameBoardImpl implements GameBoard {
     return cell.requestBridgeCount === 0;
   }
 
-  printBoard(): void {
+  printBoard(isFinalPrint: boolean = false): string {
     // Implementation for printing the board
     // Iterate through each cell and print the appropriate representation
+    let finalStr = "";
+    let beginState = this.history[0];
     for (const row of this.currentState.grid) {
       let rowStr = "";
       for (const cell of row) {
@@ -153,7 +155,13 @@ export class GameBoardImpl implements GameBoard {
             rowStr += ".";
             break;
           case "Island":
-            rowStr += cell.requestBridgeCount.toString(16);
+            if (isFinalPrint) {
+              let beginIslandCell = beginState.grid[cell.coord[0]][cell.coord[1]] as IslandCell;
+              rowStr += beginIslandCell.requestBridgeCount.toString(16);
+            } else {
+              rowStr += cell.requestBridgeCount.toString(16);
+            }
+
             break;
           case "Bridge":
             if (cell.direction === "horizontal") {
@@ -170,6 +178,10 @@ export class GameBoardImpl implements GameBoard {
         }
       }
       console.log(rowStr);
+
+      finalStr+=rowStr;
+      finalStr+="\n";
     }
+    return finalStr;
   }
 }

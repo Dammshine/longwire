@@ -241,15 +241,27 @@ export function identifyAndSortSubgraphs(graph: Graph): Edge[][] {
 
   const dfs = (nodeId: NodeId, edgesInSubgraph: Edge[]) => {
     visited.add(nodeId);
+
+    // Check edges where the node is the start
     graph.adjacencyList.get(nodeId).forEach((edge) => {
       if (!visited.has(edge.end)) {
         edgesInSubgraph.push(edge);
         dfs(edge.end, edgesInSubgraph);
       }
     });
+
+    // Check edges where the node is the end
+    graph.nodes.forEach((_, otherNodeId) => {
+      graph.adjacencyList.get(otherNodeId).forEach((edge) => {
+        if (edge.end === nodeId && !visited.has(otherNodeId)) {
+          edgesInSubgraph.push(edge);
+          dfs(otherNodeId, edgesInSubgraph);
+        }
+      });
+    });
   };
 
-  graph.nodes.forEach((node, nodeId) => {
+  graph.nodes.forEach((_, nodeId) => {
     if (!visited.has(nodeId)) {
       let edgesInSubgraph = [];
       dfs(nodeId, edgesInSubgraph);
