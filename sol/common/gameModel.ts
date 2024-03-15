@@ -60,3 +60,26 @@ function coordToString(coord: Coord): string {
   // Converts a coordinate array to a string representation
   return `(${coord[1]}, ${coord[0]})`;
 }
+
+export function hashGameState(gameState: GameState): string {
+  let hash = '';
+
+  gameState.grid.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      hash += `${cell.cellType}_${rowIndex}_${colIndex}_`;
+      if (cell.cellType === "Island") {
+        hash += `${cell.requestBridgeCount}_`;
+      } else if (cell.cellType === "Bridge") {
+        if (cell.bridgeCount === 0) {
+          hash += `0_`;
+        } else {
+          hash += `${cell.bridgeCount}_${cell.direction}_`;
+        }
+      } else if (cell.cellType === "Water") {
+        hash += '_';
+      }
+    });
+  });
+
+  return hash;
+}

@@ -1,5 +1,10 @@
-import { Coord, GameBoard, Operation } from "../common/gameModel";
-import { Graph, Edge, parseGameStateToGraph } from "../common/graph"
+import { Coord, GameBoard, Operation, hashGameState } from "../common/gameModel";
+import {
+  Graph,
+  Edge,
+  parseGameStateToGraph,
+  doEdgesCross,
+} from "../common/graph";
 import { AgentBase } from "../agent/agent";
 import { exit } from "process";
 
@@ -14,7 +19,7 @@ export class RecursiveChoiceAgent implements AgentBase {
 
   makeMove(gameBoard: GameBoard): Operation[] {
     const gameState = gameBoard.currentState;
-    const gameStateString = JSON.stringify(gameState);
+    const gameStateString = hashGameState(gameState);
     const graph = parseGameStateToGraph(gameState);
 
     // Early return strategy
@@ -26,7 +31,7 @@ export class RecursiveChoiceAgent implements AgentBase {
       if (this.choiceHistory.has(gameStateString)) return [];
       this.choiceHistory.set(gameStateString, -1);
 
-      return earlyReturn.map(edge => this.edgeToOperation(edge));
+      return earlyReturn.map((edge) => this.edgeToOperation(edge));
     }
 
     let edges = this.getAllEdges(graph);
@@ -65,7 +70,7 @@ export class RecursiveChoiceAgent implements AgentBase {
       if (node.weight > 0) {
         let totalEdgeWeight = 0;
         let edges: Edge[] = [];
-  
+
         for (const [adjNodeId, adjNodeEdges] of graph.adjacencyList) {
           for (const edge of adjNodeEdges) {
             if (edge.start === nodeId || edge.end === nodeId) {
@@ -74,7 +79,7 @@ export class RecursiveChoiceAgent implements AgentBase {
             }
           }
         }
-  
+
         if (totalEdgeWeight < node.weight) {
           // Node's weight is greater than total edge weight
           return false;
@@ -87,26 +92,29 @@ export class RecursiveChoiceAgent implements AgentBase {
     return true;
   }
 
-
-  // TODO: First optimization: Prioritize those edge only have one edge 
+  // TODO: First optimization: Prioritize those edge only have one edge
   //    => so that if it don't get resolved, solve other edges will make it's situation worse
   private sortEdges(edges: Edge[], graph: Graph): Edge[] {
-    const nodeConnectionCounts = new Map<string, number>();
-    for (const [nodeId, nodeEdges] of graph.adjacencyList) {
-      nodeConnectionCounts.set(nodeId, nodeEdges.length);
-    }
+    // Create a map to count how many other edges each edge blocks
+    const edgeBlockCount = new Map<Edge, number>();
 
+    // Populate the edgeBlockCount map
+    edges.forEach((edge) => {
+      let count = 0;
+      edges.forEach((otherEdge) => {
+        if (edge !== otherEdge && doEdgesCross(edge, otherEdge, graph)) {
+          count++;
+        }
+      });
+      edgeBlockCount.set(edge, count);
+    });
+
+    // Now sort the edges based on how many other edges they block
     return edges.sort((a, b) => {
-      const aStartConnections = nodeConnectionCounts.get(a.start) || 0;
-      const bStartConnections = nodeConnectionCounts.get(b.start) || 0;
+      const aBlockCount = edgeBlockCount.get(a) || 0;
+      const bBlockCount = edgeBlockCount.get(b) || 0;
 
-      if (aStartConnections !== bStartConnections) {
-        return aStartConnections - bStartConnections;
-      }
-
-      const startCompare = a.start.localeCompare(b.start);
-      if (startCompare !== 0) return startCompare;
-      return a.end.localeCompare(b.end);
+      return aBlockCount - bBlockCount;
     });
   }
 

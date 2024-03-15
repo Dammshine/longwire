@@ -198,3 +198,39 @@ export function parseGameStateToGraph(gameState: GameState): Graph {
   }
   return graph;
 }
+
+export function doEdgesCross(edge1: Edge, edge2: Edge, graph: Graph): boolean {
+  const getCoords = (nodeId: string) => {
+    return nodeId.split(',').map(Number);
+  };
+
+  // Get coordinates of the nodes (islands) for each edge
+  const edge1StartCoord = getCoords(graph.getNode(edge1.start).id);
+  const edge1EndCoord = getCoords(graph.getNode(edge1.end).id);
+  const edge2StartCoord = getCoords(graph.getNode(edge2.start).id);
+  const edge2EndCoord = getCoords(graph.getNode(edge2.end).id);
+
+  // Check if edge1 is horizontal and edge2 is vertical or vice versa
+  const edge1IsHorizontal = edge1StartCoord[0] === edge1EndCoord[0];
+  const edge2IsVertical = edge2StartCoord[1] === edge2EndCoord[1];
+
+  if (edge1IsHorizontal && edge2IsVertical) {
+    return edge1StartCoord[0] >= Math.min(edge2StartCoord[1], edge2EndCoord[1]) &&
+           edge1StartCoord[0] <= Math.max(edge2StartCoord[1], edge2EndCoord[1]) &&
+           edge2StartCoord[0] >= Math.min(edge1StartCoord[1], edge1EndCoord[1]) &&
+           edge2StartCoord[0] <= Math.max(edge1StartCoord[1], edge1EndCoord[1]);
+  }
+
+  // Swap edges and check the other combination
+  const edge1IsVertical = edge1StartCoord[1] === edge1EndCoord[1];
+  const edge2IsHorizontal = edge2StartCoord[0] === edge2EndCoord[0];
+
+  if (edge1IsVertical && edge2IsHorizontal) {
+    return edge2StartCoord[0] >= Math.min(edge1StartCoord[1], edge1EndCoord[1]) &&
+           edge2StartCoord[0] <= Math.max(edge1StartCoord[1], edge1EndCoord[1]) &&
+           edge1StartCoord[0] >= Math.min(edge2StartCoord[1], edge2EndCoord[1]) &&
+           edge1StartCoord[0] <= Math.max(edge2StartCoord[1], edge2EndCoord[1]);
+  }
+
+  return false;
+}
