@@ -234,3 +234,31 @@ export function doEdgesCross(edge1: Edge, edge2: Edge, graph: Graph): boolean {
 
   return false;
 }
+
+export function identifyAndSortSubgraphs(graph: Graph): Edge[][] {
+  let visited = new Set<NodeId>();
+  let subgraphs = [];
+
+  const dfs = (nodeId: NodeId, edgesInSubgraph: Edge[]) => {
+    visited.add(nodeId);
+    graph.adjacencyList.get(nodeId).forEach((edge) => {
+      if (!visited.has(edge.end)) {
+        edgesInSubgraph.push(edge);
+        dfs(edge.end, edgesInSubgraph);
+      }
+    });
+  };
+
+  graph.nodes.forEach((node, nodeId) => {
+    if (!visited.has(nodeId)) {
+      let edgesInSubgraph = [];
+      dfs(nodeId, edgesInSubgraph);
+      subgraphs.push(edgesInSubgraph);
+    }
+  });
+
+  // Sort subgraphs based on the number of edges
+  subgraphs.sort((a, b) => a.length - b.length);
+
+  return subgraphs;
+}

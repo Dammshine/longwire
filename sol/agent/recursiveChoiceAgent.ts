@@ -1,9 +1,15 @@
-import { Coord, GameBoard, Operation, hashGameState } from "../common/gameModel";
+import {
+  Coord,
+  GameBoard,
+  Operation,
+  hashGameState,
+} from "../common/gameModel";
 import {
   Graph,
   Edge,
   parseGameStateToGraph,
   doEdgesCross,
+  identifyAndSortSubgraphs,
 } from "../common/graph";
 import { AgentBase } from "../agent/agent";
 import { exit } from "process";
@@ -95,27 +101,41 @@ export class RecursiveChoiceAgent implements AgentBase {
   // TODO: First optimization: Prioritize those edge only have one edge
   //    => so that if it don't get resolved, solve other edges will make it's situation worse
   private sortEdges(edges: Edge[], graph: Graph): Edge[] {
-    // Create a map to count how many other edges each edge blocks
+    // Identify subgraphs
+    const subgraphs = identifyAndSortSubgraphs(graph);
+  
+    // Count how many edges each edge blocks
     const edgeBlockCount = new Map<Edge, number>();
-
-    // Populate the edgeBlockCount map
-    edges.forEach((edge) => {
+    edges.forEach(edge => {
       let count = 0;
-      edges.forEach((otherEdge) => {
+      edges.forEach(otherEdge => {
         if (edge !== otherEdge && doEdgesCross(edge, otherEdge, graph)) {
           count++;
         }
       });
       edgeBlockCount.set(edge, count);
     });
-
-    // Now sort the edges based on how many other edges they block
-    return edges.sort((a, b) => {
-      const aBlockCount = edgeBlockCount.get(a) || 0;
-      const bBlockCount = edgeBlockCount.get(b) || 0;
-
-      return aBlockCount - bBlockCount;
+  
+    // Group edges by subgraphs
+    let groupedEdges = new Map<string, Edge[]>();
+    subgraphs.forEach((subgraphEdges, subgraphId) => {
+      subgraphEdges.forEach(edge => {
+        if (groupedEdges.has(subgraphId.toString())) {
+          groupedEdges.get(subgraphId.toString()).push(edge);
+        } else {
+          groupedEdges.set(subgraphId.toString(), [edge]);
+        }
+      });
     });
+  
+    // Sort edges within each subgraph by block count and then flatten
+    let sortedEdges = [];
+    Array.from(groupedEdges.values()).sort((a, b) => a.length - b.length).forEach(subgraphEdges => {
+      subgraphEdges.sort((edge1, edge2) => edgeBlockCount.get(edge1) - edgeBlockCount.get(edge2));
+      sortedEdges.push(...subgraphEdges);
+    });
+  
+    return sortedEdges;
   }
 
   private edgeToOperation(edge: Edge): Operation {
